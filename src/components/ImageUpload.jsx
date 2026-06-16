@@ -15,9 +15,7 @@ const ImageUpload = ({ value, onChange, label = 'Image', accept = 'image/*' }) =
     try {
       const fd = new FormData()
       fd.append('file', file)
-      const { data } = await api.post('/admin/media/upload', fd, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
+      const { data } = await api.post('/admin/media/upload', fd)
       const url = data.data.url
       setPreview(url)
       onChange(url)

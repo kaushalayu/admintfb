@@ -28,9 +28,7 @@ const Media = () => {
     formData.append('file', file)
 
     try {
-      await api.post('/admin/media/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
+      await api.post('/admin/media/upload', formData)
       fetchMedia()
     } catch (err) {
       Toast.fire({ icon: 'error', title: err.response?.data?.message || 'Upload failed' })
