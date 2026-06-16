@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import Sidebar from './components/Sidebar'
@@ -32,15 +33,18 @@ const ProtectedRoute = ({ children }) => {
   return children
 }
 
-const AdminLayout = ({ children }) => (
-  <div className="admin-layout">
-    <Sidebar />
-    <div className="admin-main">
-      <Header />
-      <div className="admin-content">{children}</div>
+const AdminLayout = ({ children }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  return (
+    <div className="admin-layout">
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className="admin-main">
+        <Header onMenuToggle={() => setSidebarOpen(prev => !prev)} />
+        <div className="admin-content">{children}</div>
+      </div>
     </div>
-  </div>
-)
+  )
+}
 
 const ProtectedPage = ({ children }) => (
   <ProtectedRoute>
