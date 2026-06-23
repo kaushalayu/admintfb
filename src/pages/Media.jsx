@@ -48,8 +48,7 @@ const Media = () => {
   }
 
   const copyUrl = (url) => {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'
-    navigator.clipboard?.writeText(`${baseUrl}${url}`)
+    navigator.clipboard?.writeText(url.startsWith('data:') ? url : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${url}`)
     Toast.fire({ icon: 'success', title: 'URL copied!' })
   }
 
@@ -89,7 +88,7 @@ const Media = () => {
                 background: '#f0f0f0', overflow: 'hidden',
               }}>
                 <img
-                  src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${item.url}`}
+                  src={item.url.startsWith('data:') ? item.url : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${item.url}`}
                   alt={item.originalName}
                   style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
                   onError={e => { e.target.style.display = 'none'; e.target.parentElement.textContent = 'Error' }}
