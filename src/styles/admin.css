@@ -749,6 +749,13 @@ select.form-control {
   padding: 16px 20px;
   min-height: 320px;
   outline: none;
+  max-width: 100%;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+.rich-editor .ProseMirror * {
+  max-width: 100%;
 }
 
 .rich-editor .ProseMirror p { margin-bottom: 10px; }
@@ -774,7 +781,7 @@ select.form-control {
   margin: 16px 0;
   overflow-x: auto;
 }
-.rich-editor .ProseMirror img { max-width: 100%; border-radius: 10px; margin: 16px 0; box-shadow: var(--shadow-md); }
+.rich-editor .ProseMirror img { max-width: 100%; height: auto; border-radius: 10px; margin: 16px 0; box-shadow: var(--shadow-md); }
 .rich-editor .ProseMirror a { color: var(--primary); text-decoration: underline; text-underline-offset: 2px; }
 .rich-editor .ProseMirror p.is-editor-empty:first-child::before {
   color: var(--text-light);

@@ -73,6 +73,7 @@ const RichEditor = ({ value, onChange, placeholder = 'Start writing...' }) => {
         <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('left').run()} isActive={editor.isActive({ textAlign: 'left' })} label="⬅" title="Align Left" />
         <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('center').run()} isActive={editor.isActive({ textAlign: 'center' })} label="⬌" title="Align Center" />
         <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('right').run()} isActive={editor.isActive({ textAlign: 'right' })} label="➡" title="Align Right" />
+        <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('justify').run()} isActive={editor.isActive({ textAlign: 'justify' })} label="↔" title="Justify" />
         <div className="divider" />
         <ToolbarButton onClick={setLink} isActive={editor.isActive('link')} label="🔗 Link" title="Link" />
         <ToolbarButton onClick={addImage} label="🖼 Image" title="Insert Image" />

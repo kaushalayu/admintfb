@@ -56,7 +56,13 @@ const ProductForm = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
-    setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }))
+    setForm(prev => {
+      const updated = { ...prev, [name]: type === 'checkbox' ? checked : value }
+      if (name === 'title' && !isEdit && !prev.slug) {
+        updated.slug = value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+      }
+      return updated
+    })
   }
 
   const addTag = (e) => {
@@ -138,12 +144,19 @@ const ProductForm = () => {
     try {
       const payload = {
         ...form,
+        slug: form.slug || form.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
         price: Number(form.price),
         salePrice: form.salePrice ? Number(form.salePrice) : undefined,
         stockQuantity: Number(form.stockQuantity),
         images: form.images.filter(img => img.url),
         colors: form.colors.filter(c => c.name),
         sizes: form.sizes.filter(s => s),
+      }
+
+      if (!payload.slug) {
+        Toast.fire({ icon: 'error', title: 'Title is required to generate slug' })
+        setSaving(false)
+        return
       }
 
       if (isEdit) {
