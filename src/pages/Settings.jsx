@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import api from '../api/axios'
 import Swal from 'sweetalert2'
 import ImageUpload from '../components/ImageUpload'
+import VideoUpload from '../components/VideoUpload'
 
 const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true })
 
@@ -152,32 +153,32 @@ const Settings = () => {
 
         <h4 style={{ margin: '16px 0 8px', color: 'var(--primary)' }}>Video Banner</h4>
         <div className="form-group">
-          <label>Banner Video URL</label>
-          <input className="form-control" name="bannerVideoUrl" value={form.bannerVideoUrl} onChange={handleChange} placeholder="https://youtube.com/watch?v=... or https://example.com/video.mp4" />
-          <small style={{ color: '#888', fontSize: 12 }}>YouTube, Vimeo link or direct MP4 URL</small>
+          <VideoUpload value={form.bannerVideoUrl} onChange={(val) => setForm(prev => ({...prev, bannerVideoUrl: val}))} label="Banner Video" />
+          <small style={{ color: '#888', fontSize: 12 }}>YouTube link, Vimeo link, or upload an MP4 file</small>
         </div>
 
         <h4 style={{ margin: '16px 0 8px', color: 'var(--primary)' }}>Instagram Posts</h4>
         <p style={{ fontSize: 13, color: '#888', marginBottom: 8 }}>Add up to 6 Instagram post images with links.</p>
         {form.instagramPosts.map((post, i) => (
-          <div key={i} className="form-row" style={{ alignItems: 'center', marginBottom: 8 }}>
-            <div className="form-group" style={{ flex: 1 }}>
-              <label>Image URL</label>
-              <input className="form-control" value={post.image} onChange={(e) => {
+          <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 12, padding: 12, background: '#f9f9f9', borderRadius: 8, flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: 180 }}>
+              <ImageUpload value={post.image} onChange={(val) => {
                 const updated = [...form.instagramPosts]
-                updated[i] = { ...updated[i], image: e.target.value }
+                updated[i] = { ...updated[i], image: val }
                 setForm(prev => ({...prev, instagramPosts: updated}))
-              }} placeholder="Image URL" />
+              }} label={`Post ${i + 1} Image`} />
             </div>
-            <div className="form-group" style={{ flex: 1 }}>
-              <label>Link URL</label>
-              <input className="form-control" value={post.url} onChange={(e) => {
-                const updated = [...form.instagramPosts]
-                updated[i] = { ...updated[i], url: e.target.value }
-                setForm(prev => ({...prev, instagramPosts: updated}))
-              }} placeholder="https://instagram.com/..." />
+            <div style={{ flex: 1, minWidth: 180 }}>
+              <div className="form-group">
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, fontSize: 14, color: 'var(--text)' }}>Link URL</label>
+                <input className="form-control" value={post.url} onChange={(e) => {
+                  const updated = [...form.instagramPosts]
+                  updated[i] = { ...updated[i], url: e.target.value }
+                  setForm(prev => ({...prev, instagramPosts: updated}))
+                }} placeholder="https://instagram.com/..." />
+              </div>
             </div>
-            <button type="button" className="btn btn-danger" style={{ marginTop: 20, padding: '6px 12px' }} onClick={() => {
+            <button type="button" className="btn btn-danger" style={{ marginTop: 22, padding: '6px 12px' }} onClick={() => {
               setForm(prev => ({...prev, instagramPosts: prev.instagramPosts.filter((_, idx) => idx !== i)}))
             }}>×</button>
           </div>
