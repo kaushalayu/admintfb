@@ -13,7 +13,7 @@ const Settings = () => {
     facebook: '', twitter: '', instagram: '', youtube: '', skype: '', whatsapp: '',
     flatShipping: 50, freeShippingThreshold: 500, currencySymbol: '₹', taxRate: 0,
     dealEndDate: '', dealTitle: '', dealDesc: '', dealImage: '',
-    bannerVideoUrl: '', instagramPosts: [],
+    bannerVideoUrl: '', instagramHandle: '@wooden_furniture_lucknow', instagramPosts: [],
   })
   const [saving, setSaving] = useState(false)
 
@@ -94,23 +94,30 @@ const Settings = () => {
         </div>
         <div className="form-row">
           <div className="form-group">
-            <label>Instagram</label>
-            <input className="form-control" name="instagram" value={form.instagram} onChange={handleChange} />
+            <label>Instagram URL</label>
+            <input className="form-control" name="instagram" value={form.instagram} onChange={handleChange} placeholder="https://instagram.com/..." />
           </div>
           <div className="form-group">
-            <label>YouTube</label>
-            <input className="form-control" name="youtube" value={form.youtube} onChange={handleChange} />
+            <label>Instagram Handle</label>
+            <input className="form-control" name="instagramHandle" value={form.instagramHandle} onChange={handleChange} placeholder="@your_handle" />
           </div>
         </div>
         <div className="form-row">
           <div className="form-group">
+            <label>YouTube</label>
+            <input className="form-control" name="youtube" value={form.youtube} onChange={handleChange} />
+          </div>
+          <div className="form-group">
             <label>Skype</label>
             <input className="form-control" name="skype" value={form.skype} onChange={handleChange} />
           </div>
+        </div>
+        <div className="form-row">
           <div className="form-group">
             <label>WhatsApp Number</label>
             <input className="form-control" name="whatsapp" value={form.whatsapp} onChange={handleChange} placeholder="+91..." />
           </div>
+          <div className="form-group" />
         </div>
 
         <h4 style={{ margin: '16px 0 8px', color: 'var(--primary)' }}>Shipping & Tax</h4>

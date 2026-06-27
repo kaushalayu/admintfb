@@ -12,7 +12,7 @@ const Banners = () => {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(null)
-  const [form, setForm] = useState({ title: '', subtitle: '', image: '', link: '', btnText: 'Shop Now', order: 0, isActive: true })
+  const [form, setForm] = useState({ title: '', subtitle: '', description: '', image: '', link: '', btnText: 'Shop Now', type: 'hero', order: 0, isActive: true })
 
   const fetchData = async () => {
     try {
@@ -25,12 +25,12 @@ const Banners = () => {
   useEffect(() => { fetchData() }, [])
 
   const openAdd = () => {
-    setForm({ title: '', subtitle: '', image: '', link: '', btnText: 'Shop Now', order: 0, isActive: true })
+    setForm({ title: '', subtitle: '', description: '', image: '', link: '', btnText: 'Shop Now', type: 'hero', order: 0, isActive: true })
     setModal('add')
   }
 
   const openEdit = (item) => {
-    setForm({ title: item.title, subtitle: item.subtitle || '', image: item.image, link: item.link || '', btnText: item.btnText || 'Shop Now', order: item.order || 0, isActive: item.isActive })
+    setForm({ title: item.title, subtitle: item.subtitle || '', description: item.description || '', image: item.image, link: item.link || '', btnText: item.btnText || 'Shop Now', type: item.type || 'hero', order: item.order || 0, isActive: item.isActive })
     setModal({ type: 'edit', id: item._id })
   }
 
@@ -112,6 +112,10 @@ const Banners = () => {
             <input className="form-control" value={form.subtitle} onChange={e => setForm({ ...form, subtitle: e.target.value })} placeholder="Banner subheading" />
           </div>
           <div className="form-group">
+            <label>Description</label>
+            <textarea className="form-control" rows="2" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Hero banner description" />
+          </div>
+          <div className="form-group">
             <ImageUpload value={form.image} onChange={(val) => setForm(prev => ({...prev, image: val}))} label="Image *" />
           </div>
           <div className="form-row">
@@ -126,15 +130,23 @@ const Banners = () => {
           </div>
           <div className="form-row">
             <div className="form-group">
+              <label>Section Type</label>
+              <select className="form-control" value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}>
+                <option value="hero">Hero Slider</option>
+                <option value="promo_row_1">Promo Row 1</option>
+                <option value="promo_row_2">Promo Row 2</option>
+              </select>
+            </div>
+            <div className="form-group">
               <label>Order</label>
               <input className="form-control" type="number" value={form.order} onChange={e => setForm({ ...form, order: Number(e.target.value) })} />
             </div>
-            <div className="form-group">
-              <label className="checkbox-label" style={{ marginTop: 24 }}>
-                <input type="checkbox" checked={form.isActive} onChange={e => setForm({ ...form, isActive: e.target.checked })} />
-                <span>Active</span>
-              </label>
-            </div>
+          </div>
+          <div className="form-group">
+            <label className="checkbox-label">
+              <input type="checkbox" checked={form.isActive} onChange={e => setForm({ ...form, isActive: e.target.checked })} />
+              <span>Active</span>
+            </label>
           </div>
         </Modal>
       )}
