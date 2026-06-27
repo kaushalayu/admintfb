@@ -117,6 +117,7 @@ const Banners = () => {
           </div>
           <div className="form-group">
             <ImageUpload value={form.image} onChange={(val) => setForm(prev => ({...prev, image: val}))} label="Image *" />
+            <p style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>Recommended: 1920×600px (wide landscape) — image ko top-bottom cut hone se bachane ke liye isi ratio ki image upload karein</p>
           </div>
           <div className="form-row">
             <div className="form-group">
