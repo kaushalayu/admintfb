@@ -3,6 +3,7 @@ import api from '../api/axios'
 import Swal from 'sweetalert2'
 import ImageUpload from '../components/ImageUpload'
 import VideoUpload from '../components/VideoUpload'
+import { CheckCircle, XCircle } from 'lucide-react'
 
 const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true })
 
@@ -14,8 +15,10 @@ const Settings = () => {
     flatShipping: 50, freeShippingThreshold: 500, currencySymbol: '₹', taxRate: 0,
     dealEndDate: '', dealTitle: '', dealDesc: '', dealImage: '',
     bannerVideoUrl: '', instagramHandle: '@wooden_furniture_lucknow', instagramPosts: [],
+    whatsappProvider: 'meta', metaPhoneId: '', metaToken: '', twilioSid: '', twilioToken: '', twilioFrom: 'whatsapp:+14155238886',
   })
   const [saving, setSaving] = useState(false)
+  const [wpConfigStatus, setWpConfigStatus] = useState(null)
 
   useEffect(() => {
     api.get('/admin/settings')
@@ -23,6 +26,12 @@ const Settings = () => {
         if (res.data.data) setForm(prev => ({ ...prev, ...res.data.data }))
       })
       .catch(err => console.error(err))
+    api.get('/admin/whatsapp/config')
+      .then(res => { if (res.data.data) setForm(prev => ({ ...prev, ...res.data.data })) })
+      .catch(() => {})
+    api.get('/admin/whatsapp/config-status')
+      .then(res => setWpConfigStatus(res.data))
+      .catch(() => {})
   }, [])
 
   const handleChange = (e) => {
@@ -35,7 +44,16 @@ const Settings = () => {
     setSaving(true)
     try {
       await api.put('/admin/settings', form)
+      await api.put('/admin/whatsapp/config', {
+        whatsappProvider: form.whatsappProvider,
+        metaPhoneId: form.metaPhoneId,
+        metaToken: form.metaToken,
+        twilioSid: form.twilioSid,
+        twilioToken: form.twilioToken,
+        twilioFrom: form.twilioFrom,
+      })
       Toast.fire({ icon: 'success', title: 'Settings saved!' })
+      api.get('/admin/whatsapp/config-status').then(r => setWpConfigStatus(r.data)).catch(() => {})
     } catch (err) {
       Toast.fire({ icon: 'error', title: err.response?.data?.message || 'Save failed' })
     } finally { setSaving(false) }
@@ -119,6 +137,59 @@ const Settings = () => {
           </div>
           <div className="form-group" />
         </div>
+
+        <h4 style={{ margin: '16px 0 8px', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+          WhatsApp API Config
+          {wpConfigStatus?.configured
+            ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--success)', fontWeight: 600 }}><CheckCircle size={14} /> Connected ({wpConfigStatus.provider})</span>
+            : <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--danger)', fontWeight: 600 }}><XCircle size={14} /> Not Configured</span>
+          }
+        </h4>
+        <div className="form-group">
+          <label>Active Provider</label>
+          <div style={{ display: 'flex', gap: 12 }}>
+            <label className="wa-recipient-option" style={{ flex: 1 }}>
+              <input type="radio" name="whatsappProvider" value="meta" checked={form.whatsappProvider === 'meta'} onChange={handleChange} />
+              <span>Meta WhatsApp Cloud API</span>
+            </label>
+            <label className="wa-recipient-option" style={{ flex: 1 }}>
+              <input type="radio" name="whatsappProvider" value="twilio" checked={form.whatsappProvider === 'twilio'} onChange={handleChange} />
+              <span>Twilio WhatsApp</span>
+            </label>
+          </div>
+        </div>
+
+        {form.whatsappProvider === 'meta' && (
+          <div className="form-row">
+            <div className="form-group">
+              <label>Meta Phone Number ID</label>
+              <input className="form-control" name="metaPhoneId" value={form.metaPhoneId} onChange={handleChange} placeholder="From Meta Business Manager" />
+            </div>
+            <div className="form-group">
+              <label>Meta Access Token</label>
+              <input className="form-control" name="metaToken" type="password" value={form.metaToken} onChange={handleChange} placeholder="Permanent access token" />
+            </div>
+          </div>
+        )}
+
+        {form.whatsappProvider === 'twilio' && (
+          <>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Twilio Account SID</label>
+                <input className="form-control" name="twilioSid" value={form.twilioSid} onChange={handleChange} placeholder="ACxxxxxxxxxxxxxxxxxxxx" />
+              </div>
+              <div className="form-group">
+                <label>Twilio Auth Token</label>
+                <input className="form-control" name="twilioToken" type="password" value={form.twilioToken} onChange={handleChange} placeholder="Your auth token" />
+              </div>
+            </div>
+            <div className="form-group">
+              <label>Twilio WhatsApp Number</label>
+              <input className="form-control" name="twilioFrom" value={form.twilioFrom} onChange={handleChange} placeholder="whatsapp:+14155238886" />
+            </div>
+          </>
+        )}
 
         <h4 style={{ margin: '16px 0 8px', color: 'var(--primary)' }}>Shipping & Tax</h4>
         <div className="form-row">

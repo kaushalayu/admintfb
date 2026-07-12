@@ -3,6 +3,7 @@ import {
   LayoutDashboard, Package, FolderTree, Tag, ShoppingCart, TicketPercent,
   FileText, HelpCircle, Users, MessageSquare, Mail, Star, Image, Settings,
   MessageCircle, PanelsTopLeft, MessageCircle as MessageCircleIcon, UserCheck,
+  Megaphone,
 } from 'lucide-react'
 
 const navItems = [
@@ -31,6 +32,8 @@ const navItems = [
   { label: 'Banners', path: '/banners', icon: PanelsTopLeft },
   { label: 'Media', path: '/media', icon: Image },
   { label: 'Settings', path: '/settings', icon: Settings },
+  { section: 'Marketing' },
+  { label: 'WhatsApp', path: '/whatsapp', icon: Megaphone },
 ]
 
 const Sidebar = ({ open, onClose }) => (

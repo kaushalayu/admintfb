@@ -25,6 +25,7 @@ import Banners from './pages/Banners'
 import BlogComments from './pages/BlogComments'
 import Settings from './pages/Settings'
 import Media from './pages/Media'
+import WhatsApp from './pages/WhatsApp'
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth()
@@ -79,6 +80,7 @@ const App = () => (
       <Route path="/blog-comments" element={<ProtectedPage><BlogComments /></ProtectedPage>} />
       <Route path="/settings" element={<ProtectedPage><Settings /></ProtectedPage>} />
       <Route path="/media" element={<ProtectedPage><Media /></ProtectedPage>} />
+      <Route path="/whatsapp" element={<ProtectedPage><WhatsApp /></ProtectedPage>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   </AuthProvider>
