@@ -22,6 +22,7 @@ import Reviews from './pages/Reviews'
 import Testimonials from './pages/Testimonials'
 import TeamPage from './pages/Team'
 import Banners from './pages/Banners'
+import Portfolio from './pages/Portfolio'
 import BlogComments from './pages/BlogComments'
 import Settings from './pages/Settings'
 import Media from './pages/Media'
@@ -77,6 +78,7 @@ const App = () => (
       <Route path="/testimonials" element={<ProtectedPage><Testimonials /></ProtectedPage>} />
       <Route path="/team" element={<ProtectedPage><TeamPage /></ProtectedPage>} />
       <Route path="/banners" element={<ProtectedPage><Banners /></ProtectedPage>} />
+      <Route path="/portfolio" element={<ProtectedPage><Portfolio /></ProtectedPage>} />
       <Route path="/blog-comments" element={<ProtectedPage><BlogComments /></ProtectedPage>} />
       <Route path="/settings" element={<ProtectedPage><Settings /></ProtectedPage>} />
       <Route path="/media" element={<ProtectedPage><Media /></ProtectedPage>} />

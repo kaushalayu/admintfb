@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Package, FolderTree, Tag, ShoppingCart, TicketPercent,
   FileText, HelpCircle, Users, MessageSquare, Mail, Star, Image, Settings,
   MessageCircle, PanelsTopLeft, MessageCircle as MessageCircleIcon, UserCheck,
-  Megaphone,
+  Megaphone, Grid,
 } from 'lucide-react'
 
 const navItems = [
@@ -30,6 +30,7 @@ const navItems = [
   { label: 'Reviews', path: '/reviews', icon: Star },
   { label: 'Testimonials', path: '/testimonials', icon: MessageCircle },
   { label: 'Banners', path: '/banners', icon: PanelsTopLeft },
+  { label: 'Portfolio', path: '/portfolio', icon: Grid },
   { label: 'Media', path: '/media', icon: Image },
   { label: 'Settings', path: '/settings', icon: Settings },
   { section: 'Marketing' },
