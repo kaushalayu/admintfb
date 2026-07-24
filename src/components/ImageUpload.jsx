@@ -96,7 +96,8 @@ const ImageUpload = ({
       setFileExt('')
       setShowNameEditor(false)
     } catch (err) {
-      alert(err.response?.data?.message || 'Upload failed')
+      const msg = err.response?.data?.message || err.message || 'Upload failed'
+      alert(msg)
     } finally {
       setUploading(false)
     }
