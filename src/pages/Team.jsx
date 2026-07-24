@@ -12,7 +12,7 @@ const TeamPage = () => {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(null)
-  const [form, setForm] = useState({ name: '', title: '', image: '', socialLinks: { facebook: '', twitter: '', skype: '', youtube: '' }, isActive: true, order: 0 })
+  const [form, setForm] = useState({ name: '', title: '', image: '', imageAlt: '', socialLinks: { facebook: '', twitter: '', skype: '', youtube: '' }, isActive: true, order: 0 })
 
   const fetchData = async () => {
     try {
@@ -25,7 +25,7 @@ const TeamPage = () => {
   useEffect(() => { fetchData() }, [])
 
   const openAdd = () => {
-    setForm({ name: '', title: '', image: '', socialLinks: { facebook: '', twitter: '', skype: '', youtube: '' }, isActive: true, order: 0 })
+    setForm({ name: '', title: '', image: '', imageAlt: '', socialLinks: { facebook: '', twitter: '', skype: '', youtube: '' }, isActive: true, order: 0 })
     setModal('add')
   }
 
@@ -34,6 +34,7 @@ const TeamPage = () => {
       name: item.name,
       title: item.title || '',
       image: item.image || '',
+      imageAlt: item.imageAlt || '',
       socialLinks: item.socialLinks || { facebook: '', twitter: '', skype: '', youtube: '' },
       isActive: item.isActive,
       order: item.order || 0,
@@ -141,7 +142,13 @@ const TeamPage = () => {
             </div>
           </div>
           <div className="form-group">
-            <ImageUpload value={form.image} onChange={(val) => setForm(prev => ({...prev, image: val}))} label="Photo" />
+            <ImageUpload
+              value={form.image}
+              altValue={form.imageAlt}
+              onChange={(url, alt) => setForm(prev => ({ ...prev, image: url, imageAlt: alt || prev.imageAlt }))}
+              onAltChange={(alt) => setForm(prev => ({ ...prev, imageAlt: alt }))}
+              label="Photo"
+            />
           </div>
           <fieldset style={{ border: '1px solid #e5e7eb', borderRadius: 8, padding: 16, marginTop: 16 }}>
             <legend style={{ fontSize: 13, fontWeight: 600, color: '#374151', padding: '0 8px' }}>Social Links</legend>

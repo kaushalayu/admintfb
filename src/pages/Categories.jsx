@@ -11,7 +11,7 @@ const Categories = () => {
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(null)
-  const [form, setForm] = useState({ name: '', slug: '', description: '', image: '', order: 0 })
+  const [form, setForm] = useState({ name: '', slug: '', description: '', image: '', imageAlt: '', order: 0 })
 
   const fetchData = async () => {
     try {       const { data } = await api.get('/admin/categories'); setCategories(data.data || []) }
@@ -21,8 +21,8 @@ const Categories = () => {
 
   useEffect(() => { fetchData() }, [])
 
-  const openAdd = () => { setForm({ name: '', slug: '', description: '', image: '', order: 0 }); setModal('add') }
-  const openEdit = (cat) => { setForm(cat); setModal({ type: 'edit', id: cat._id }) }
+  const openAdd = () => { setForm({ name: '', slug: '', description: '', image: '', imageAlt: '', order: 0 }); setModal('add') }
+  const openEdit = (cat) => { setForm({ ...cat, imageAlt: cat.imageAlt || '' }); setModal({ type: 'edit', id: cat._id }) }
 
   const handleSave = async () => {
     try {
@@ -73,7 +73,15 @@ const Categories = () => {
             <input className="form-control" value={form.name} onChange={e => setForm({ ...form, name: e.target.value, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })} /></div>
           <div className="form-group"><label>Slug</label><input className="form-control" value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} /></div>
           <div className="form-group"><label>Description</label><textarea className="form-control" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} /></div>
-          <div className="form-group"><ImageUpload value={form.image} onChange={(val) => setForm({...form, image: val})} label="Image" /></div>
+          <div className="form-group">
+            <ImageUpload
+              value={form.image}
+              altValue={form.imageAlt}
+              onChange={(url, alt) => setForm(prev => ({ ...prev, image: url, imageAlt: alt || prev.imageAlt }))}
+              onAltChange={(alt) => setForm(prev => ({ ...prev, imageAlt: alt }))}
+              label="Image"
+            />
+          </div>
           <div className="form-group"><label>Order</label><input className="form-control" type="number" value={form.order} onChange={e => setForm({ ...form, order: Number(e.target.value) })} /></div>
         </Modal>
       )}

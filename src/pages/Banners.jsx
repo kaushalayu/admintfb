@@ -12,7 +12,7 @@ const Banners = () => {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(null)
-  const [form, setForm] = useState({ title: '', subtitle: '', description: '', image: '', link: '', btnText: 'Shop Now', type: 'hero', order: 0, isActive: true })
+  const [form, setForm] = useState({ title: '', subtitle: '', description: '', image: '', imageAlt: '', link: '', btnText: 'Shop Now', type: 'hero', order: 0, isActive: true })
 
   const fetchData = async () => {
     try {
@@ -25,12 +25,12 @@ const Banners = () => {
   useEffect(() => { fetchData() }, [])
 
   const openAdd = () => {
-    setForm({ title: '', subtitle: '', description: '', image: '', link: '', btnText: 'Shop Now', type: 'hero', order: 0, isActive: true })
+    setForm({ title: '', subtitle: '', description: '', image: '', imageAlt: '', link: '', btnText: 'Shop Now', type: 'hero', order: 0, isActive: true })
     setModal('add')
   }
 
   const openEdit = (item) => {
-    setForm({ title: item.title, subtitle: item.subtitle || '', description: item.description || '', image: item.image, link: item.link || '', btnText: item.btnText || 'Shop Now', type: item.type || 'hero', order: item.order || 0, isActive: item.isActive })
+    setForm({ title: item.title, subtitle: item.subtitle || '', description: item.description || '', image: item.image, imageAlt: item.imageAlt || '', link: item.link || '', btnText: item.btnText || 'Shop Now', type: item.type || 'hero', order: item.order || 0, isActive: item.isActive })
     setModal({ type: 'edit', id: item._id })
   }
 
@@ -116,7 +116,13 @@ const Banners = () => {
             <textarea className="form-control" rows="2" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Hero banner description" />
           </div>
           <div className="form-group">
-            <ImageUpload value={form.image} onChange={(val) => setForm(prev => ({...prev, image: val}))} label="Image *" />
+            <ImageUpload
+              value={form.image}
+              altValue={form.imageAlt}
+              onChange={(url, alt) => setForm(prev => ({ ...prev, image: url, imageAlt: alt || prev.imageAlt }))}
+              onAltChange={(alt) => setForm(prev => ({ ...prev, imageAlt: alt }))}
+              label="Image *"
+            />
             <p style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>Recommended: 1920×600px (wide landscape) — image ko top-bottom cut hone se bachane ke liye isi ratio ki image upload karein</p>
           </div>
           <div className="form-row">

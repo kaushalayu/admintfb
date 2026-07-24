@@ -11,7 +11,7 @@ const Brands = () => {
   const [brands, setBrands] = useState([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(null)
-  const [form, setForm] = useState({ name: '', slug: '', logo: '' })
+  const [form, setForm] = useState({ name: '', slug: '', logo: '', logoAlt: '' })
 
   const fetchData = async () => {
     try {       const { data } = await api.get('/admin/brands'); setBrands(data.data || []) }
@@ -21,8 +21,8 @@ const Brands = () => {
 
   useEffect(() => { fetchData() }, [])
 
-  const openAdd = () => { setForm({ name: '', slug: '', logo: '' }); setModal('add') }
-  const openEdit = (brand) => { setForm(brand); setModal({ type: 'edit', id: brand._id }) }
+  const openAdd = () => { setForm({ name: '', slug: '', logo: '', logoAlt: '' }); setModal('add') }
+  const openEdit = (brand) => { setForm({ ...brand, logoAlt: brand.logoAlt || '' }); setModal({ type: 'edit', id: brand._id }) }
 
   const handleSave = async () => {
     try {
@@ -71,7 +71,15 @@ const Brands = () => {
           <div className="form-group"><label>Name *</label>
             <input className="form-control" value={form.name} onChange={e => setForm({ ...form, name: e.target.value, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })} /></div>
           <div className="form-group"><label>Slug</label><input className="form-control" value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} /></div>
-          <div className="form-group"><ImageUpload value={form.logo} onChange={(val) => setForm({...form, logo: val})} label="Logo" /></div>
+          <div className="form-group">
+            <ImageUpload
+              value={form.logo}
+              altValue={form.logoAlt}
+              onChange={(url, alt) => setForm(prev => ({ ...prev, logo: url, logoAlt: alt || prev.logoAlt }))}
+              onAltChange={(alt) => setForm(prev => ({ ...prev, logoAlt: alt }))}
+              label="Logo"
+            />
+          </div>
         </Modal>
       )}
     </div>

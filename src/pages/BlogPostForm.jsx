@@ -14,7 +14,7 @@ const BlogPostForm = () => {
   const isEdit = !!id
 
   const [form, setForm] = useState({
-    title: '', slug: '', content: '', excerpt: '', featuredImage: '',
+    title: '', slug: '', content: '', excerpt: '', featuredImage: '', featuredImageAlt: '',
     author: 'Admin', category: '', tags: [], published: true,
     publishedAt: new Date().toISOString().slice(0, 16),
     metaTitle: '', metaDescription: '', metaKeywords: '',
@@ -44,6 +44,7 @@ const BlogPostForm = () => {
             content: found.content || '',
             excerpt: found.excerpt || '',
             featuredImage: found.featuredImage || '',
+            featuredImageAlt: found.featuredImageAlt || '',
             author: found.author || 'Admin',
             category: found.category || '',
             tags: found.tags || [],
@@ -166,7 +167,13 @@ const BlogPostForm = () => {
           <textarea className="form-control" name="excerpt" value={form.excerpt} onChange={handleChange} rows={3} placeholder="Short summary for blog listing..." />
         </div>
         <div className="form-group">
-          <ImageUpload value={form.featuredImage} onChange={(val) => setForm(prev => ({...prev, featuredImage: val}))} label="Featured Image" />
+          <ImageUpload
+            value={form.featuredImage}
+            altValue={form.featuredImageAlt}
+            onChange={(url, alt) => setForm(prev => ({ ...prev, featuredImage: url, featuredImageAlt: alt || prev.featuredImageAlt }))}
+            onAltChange={(alt) => setForm(prev => ({ ...prev, featuredImageAlt: alt }))}
+            label="Featured Image"
+          />
         </div>
         <div className="form-group">
           <label>Content *</label>
@@ -265,7 +272,13 @@ const BlogPostForm = () => {
                   <input className="form-control" name="ogTitle" value={form.ogTitle} onChange={handleChange} placeholder="Title for social share" maxLength={70} />
                 </div>
                 <div className="form-group">
-                  <ImageUpload value={form.ogImage} onChange={(val) => setForm(prev => ({...prev, ogImage: val}))} label="OG Image" />
+                  <ImageUpload
+                    value={form.ogImage}
+                    altValue={form.ogImageAlt}
+                    onChange={(url, alt) => setForm(prev => ({ ...prev, ogImage: url, ogImageAlt: alt || prev.ogImageAlt }))}
+                    onAltChange={(alt) => setForm(prev => ({ ...prev, ogImageAlt: alt }))}
+                    label="OG Image"
+                  />
                 </div>
               </div>
 

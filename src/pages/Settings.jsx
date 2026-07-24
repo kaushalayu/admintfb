@@ -76,10 +76,21 @@ const Settings = () => {
         </div>
         <div className="form-row">
           <div className="form-group">
-            <ImageUpload value={form.siteLogo} onChange={(val) => setForm(prev => ({...prev, siteLogo: val}))} label="Logo" />
+            <ImageUpload
+              value={form.siteLogo}
+              altValue={form.siteLogoAlt}
+              onChange={(url, alt) => setForm(prev => ({ ...prev, siteLogo: url, siteLogoAlt: alt || prev.siteLogoAlt }))}
+              onAltChange={(alt) => setForm(prev => ({ ...prev, siteLogoAlt: alt }))}
+              label="Logo"
+            />
           </div>
           <div className="form-group">
-            <ImageUpload value={form.favicon} onChange={(val) => setForm(prev => ({...prev, favicon: val}))} label="Favicon" accept="image/x-icon,image/png,image/svg+xml" />
+            <ImageUpload
+              value={form.favicon}
+              onChange={(url) => setForm(prev => ({ ...prev, favicon: url }))}
+              label="Favicon"
+              accept="image/x-icon,image/png,image/svg+xml"
+            />
           </div>
         </div>
 
@@ -226,7 +237,13 @@ const Settings = () => {
           <textarea className="form-control" name="dealDesc" rows="2" value={form.dealDesc} onChange={handleChange} />
         </div>
         <div className="form-group">
-          <ImageUpload value={form.dealImage} onChange={(val) => setForm(prev => ({...prev, dealImage: val}))} label="Deal Image" />
+          <ImageUpload
+            value={form.dealImage}
+            altValue={form.dealImageAlt}
+            onChange={(url, alt) => setForm(prev => ({ ...prev, dealImage: url, dealImageAlt: alt || prev.dealImageAlt }))}
+            onAltChange={(alt) => setForm(prev => ({ ...prev, dealImageAlt: alt }))}
+            label="Deal Image"
+          />
         </div>
 
         <h4 style={{ margin: '16px 0 8px', color: 'var(--primary)' }}>Video Banner</h4>
@@ -240,11 +257,21 @@ const Settings = () => {
         {form.instagramPosts.map((post, i) => (
           <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 12, padding: 12, background: '#f9f9f9', borderRadius: 8, flexWrap: 'wrap' }}>
             <div style={{ flex: 1, minWidth: 180 }}>
-              <ImageUpload value={post.image} onChange={(val) => {
-                const updated = [...form.instagramPosts]
-                updated[i] = { ...updated[i], image: val }
-                setForm(prev => ({...prev, instagramPosts: updated}))
-              }} label={`Post ${i + 1} Image`} />
+              <ImageUpload
+                  value={post.image}
+                  altValue={post.imageAlt}
+                  onChange={(url, alt) => {
+                    const updated = [...form.instagramPosts]
+                    updated[i] = { ...updated[i], image: url, imageAlt: alt || updated[i].imageAlt }
+                    setForm(prev => ({...prev, instagramPosts: updated}))
+                  }}
+                  onAltChange={(alt) => {
+                    const updated = [...form.instagramPosts]
+                    updated[i] = { ...updated[i], imageAlt: alt }
+                    setForm(prev => ({...prev, instagramPosts: updated}))
+                  }}
+                  label={`Post ${i + 1} Image`}
+                />
             </div>
             <div style={{ flex: 1, minWidth: 180 }}>
               <div className="form-group">

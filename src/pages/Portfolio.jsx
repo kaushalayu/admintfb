@@ -12,7 +12,7 @@ const Portfolio = () => {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(null)
-  const [form, setForm] = useState({ title: '', description: '', image: '', category: 'general', link: '', order: 0, isActive: true })
+  const [form, setForm] = useState({ title: '', description: '', image: '', imageAlt: '', category: 'general', link: '', order: 0, isActive: true })
 
   const fetchData = async () => {
     try {
@@ -25,12 +25,12 @@ const Portfolio = () => {
   useEffect(() => { fetchData() }, [])
 
   const openAdd = () => {
-    setForm({ title: '', description: '', image: '', category: 'general', link: '', order: 0, isActive: true })
+    setForm({ title: '', description: '', image: '', imageAlt: '', category: 'general', link: '', order: 0, isActive: true })
     setModal('add')
   }
 
   const openEdit = (item) => {
-    setForm({ title: item.title, description: item.description || '', image: item.image, category: item.category || 'general', link: item.link || '', order: item.order || 0, isActive: item.isActive })
+    setForm({ title: item.title, description: item.description || '', image: item.image, imageAlt: item.imageAlt || '', category: item.category || 'general', link: item.link || '', order: item.order || 0, isActive: item.isActive })
     setModal({ type: 'edit', id: item._id })
   }
 
@@ -111,7 +111,13 @@ const Portfolio = () => {
             <textarea className="form-control" rows="2" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Brief description" />
           </div>
           <div className="form-group">
-            <ImageUpload value={form.image} onChange={(val) => setForm(prev => ({...prev, image: val}))} label="Image *" />
+            <ImageUpload
+              value={form.image}
+              altValue={form.imageAlt}
+              onChange={(url, alt) => setForm(prev => ({ ...prev, image: url, imageAlt: alt || prev.imageAlt }))}
+              onAltChange={(alt) => setForm(prev => ({ ...prev, imageAlt: alt }))}
+              label="Image *"
+            />
             <p style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>Recommended: 800x600px or similar landscape ratio</p>
           </div>
           <div className="form-row">

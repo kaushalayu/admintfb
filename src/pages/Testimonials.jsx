@@ -12,7 +12,7 @@ const Testimonials = () => {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(null)
-  const [form, setForm] = useState({ name: '', title: '', content: '', rating: 5, image: '', isActive: true, order: 0 })
+  const [form, setForm] = useState({ name: '', title: '', content: '', rating: 5, image: '', imageAlt: '', isActive: true, order: 0 })
 
   const fetchData = async () => {
     try {
@@ -25,12 +25,12 @@ const Testimonials = () => {
   useEffect(() => { fetchData() }, [])
 
   const openAdd = () => {
-    setForm({ name: '', title: '', content: '', rating: 5, image: '', isActive: true, order: 0 })
+    setForm({ name: '', title: '', content: '', rating: 5, image: '', imageAlt: '', isActive: true, order: 0 })
     setModal('add')
   }
 
   const openEdit = (item) => {
-    setForm({ name: item.name, title: item.title || '', content: item.content, rating: item.rating || 5, image: item.image || '', isActive: item.isActive, order: item.order || 0 })
+    setForm({ name: item.name, title: item.title || '', content: item.content, rating: item.rating || 5, image: item.image || '', imageAlt: item.imageAlt || '', isActive: item.isActive, order: item.order || 0 })
     setModal({ type: 'edit', id: item._id })
   }
 
@@ -139,7 +139,13 @@ const Testimonials = () => {
             </div>
           </div>
           <div className="form-group">
-            <ImageUpload value={form.image} onChange={(val) => setForm(prev => ({...prev, image: val}))} label="Image" />
+            <ImageUpload
+              value={form.image}
+              altValue={form.imageAlt}
+              onChange={(url, alt) => setForm(prev => ({ ...prev, image: url, imageAlt: alt || prev.imageAlt }))}
+              onAltChange={(alt) => setForm(prev => ({ ...prev, imageAlt: alt }))}
+              label="Image"
+            />
           </div>
           <div className="form-group">
             <label className="checkbox-label">
