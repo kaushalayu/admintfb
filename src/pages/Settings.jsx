@@ -9,11 +9,11 @@ const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: 
 
 const Settings = () => {
   const [form, setForm] = useState({
-    siteName: 'The Furniture Boutique', siteLogo: '', favicon: '',
+    siteName: 'The Furniture Boutique', siteLogo: '', siteLogoAlt: '', favicon: '',
     address: '', email: '', phone: '',
     facebook: '', twitter: '', instagram: '', youtube: '', skype: '', whatsapp: '',
     flatShipping: 50, freeShippingThreshold: 500, currencySymbol: '₹', taxRate: 0,
-    dealEndDate: '', dealTitle: '', dealDesc: '', dealImage: '',
+    dealEndDate: '', dealTitle: '', dealDesc: '', dealImage: '', dealImageAlt: '',
     bannerVideoUrl: '', instagramHandle: '@wooden_furniture_lucknow', instagramPosts: [],
     whatsappProvider: 'meta', metaPhoneId: '', metaToken: '', twilioSid: '', twilioToken: '', twilioFrom: 'whatsapp:+14155238886',
   })

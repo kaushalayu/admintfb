@@ -16,6 +16,8 @@ const ProductForm = () => {
     featured: false, tags: [], colors: [], sizes: [], specifications: [],
     additionalInfo: '', customContent: '',
     images: [{ url: '', alt: '', isPrimary: true }],
+    // SEO fields
+    metaTitle: '', metaDescription: '', metaKeywords: '', canonicalUrl: '',
   })
   const [categories, setCategories] = useState([])
   const [tagInput, setTagInput] = useState('')
@@ -49,6 +51,11 @@ const ProductForm = () => {
           additionalInfo: found.additionalInfo || '',
           customContent: found.customContent || '',
           images: found.images?.length > 0 ? found.images : [{ url: '', alt: '', isPrimary: true }],
+          // SEO fields
+          metaTitle: found.metaTitle || '',
+          metaDescription: found.metaDescription || '',
+          metaKeywords: found.metaKeywords || '',
+          canonicalUrl: found.canonicalUrl || '',
         })
       }).catch(() => {})
     }
@@ -319,6 +326,74 @@ const ProductForm = () => {
             </div>
           ))}
           <button type="button" className="btn btn-outline btn-sm" onClick={addImage}>+ Add Image</button>
+        </div>
+
+        {/* ── SEO Section ── */}
+        <div style={{ marginTop: 28, borderTop: '2px solid var(--border)', paddingTop: 20 }}>
+          <h4 style={{ margin: '0 0 16px', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            SEO Settings
+          </h4>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Meta Title <span style={{ fontSize: 11, color: '#9ca3af' }}>(50–60 chars recommended)</span></label>
+              <input
+                className="form-control"
+                name="metaTitle"
+                value={form.metaTitle}
+                onChange={handleChange}
+                placeholder="e.g. Teak King Bed – Buy Online | The Furniture Boutique"
+                maxLength={70}
+              />
+              <div style={{ fontSize: 11, color: form.metaTitle.length > 60 ? '#ef4444' : '#9ca3af', marginTop: 3 }}>
+                {form.metaTitle.length}/70 · {form.metaTitle.length >= 50 && form.metaTitle.length <= 60 ? '✓ Good' : form.metaTitle.length > 60 ? '⚠ Too long' : 'Add more'}
+              </div>
+            </div>
+            <div className="form-group">
+              <label>Meta Keywords <span style={{ fontSize: 11, color: '#9ca3af' }}>(comma separated)</span></label>
+              <input
+                className="form-control"
+                name="metaKeywords"
+                value={form.metaKeywords}
+                onChange={handleChange}
+                placeholder="teak bed, king size bed, wooden bed Lucknow"
+              />
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Meta Description <span style={{ fontSize: 11, color: '#9ca3af' }}>(120–160 chars recommended)</span></label>
+            <textarea
+              className="form-control"
+              name="metaDescription"
+              value={form.metaDescription}
+              onChange={handleChange}
+              rows={2}
+              placeholder="e.g. Buy premium teak king size bed at ₹38,999. 5-year warranty, free delivery in Lucknow..."
+              maxLength={160}
+            />
+            <div style={{ fontSize: 11, color: form.metaDescription.length > 160 ? '#ef4444' : '#9ca3af', marginTop: 3 }}>
+              {form.metaDescription.length}/160 · {form.metaDescription.length >= 120 && form.metaDescription.length <= 160 ? '✓ Good' : form.metaDescription.length > 160 ? '⚠ Too long' : 'Add more'}
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Canonical URL <span style={{ fontSize: 11, color: '#9ca3af' }}>(optional — leave blank to auto-generate)</span></label>
+            <input
+              className="form-control"
+              name="canonicalUrl"
+              value={form.canonicalUrl}
+              onChange={handleChange}
+              placeholder="https://thefurnitureboutique.in/product/your-slug"
+            />
+          </div>
+          {/* Google preview */}
+          {(form.metaTitle || form.title) && (
+            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8, padding: 16, marginTop: 4 }}>
+              <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5 }}>Google Search Preview</div>
+              <div style={{ fontSize: 11, color: '#5f6368' }}>thefurnitureboutique.in › product › {form.slug || 'product-slug'}</div>
+              <div style={{ fontSize: 17, color: '#1a0dab', fontWeight: 400, margin: '2px 0' }}>{(form.metaTitle || form.title).slice(0, 60)}</div>
+              <div style={{ fontSize: 13, color: '#4d5156' }}>{(form.metaDescription || form.description || '').slice(0, 160)}</div>
+            </div>
+          )}
         </div>
 
         <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
