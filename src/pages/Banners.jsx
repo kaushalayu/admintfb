@@ -62,7 +62,7 @@ const Banners = () => {
   const columns = [
     { header: 'Preview', render: row => (
       row.image
-        ? <img src={row.image} alt={row.title} style={{ width: 80, height: 45, borderRadius: 6, objectFit: 'cover', border: '1px solid #e5e7eb' }} />
+        ? <img src={row.image} alt={row.title} onClick={() => window.open(row.image, '_blank')} style={{ width: 80, height: 45, borderRadius: 6, objectFit: 'cover', border: '1px solid #e5e7eb', cursor: 'pointer' }} />
         : <div style={{ width: 80, height: 45, borderRadius: 6, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: 11 }}>No Image</div>
     ) },
     { header: 'Title', render: row => <div><strong>{row.title}</strong>{row.subtitle ? <div style={{ fontSize: 12, color: '#6b7280' }}>{row.subtitle}</div> : null}</div> },
