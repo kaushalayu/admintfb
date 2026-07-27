@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Search, Eye, EyeOff, ChevronDown, ChevronUp, FileText } from 'lucide-react'
+import { Search, Eye, EyeOff, ChevronDown, ChevronUp, FileText, Save, Clock } from 'lucide-react'
 import api from '../api/axios'
 import RichEditor from '../components/RichEditor'
 import Swal from 'sweetalert2'
@@ -8,25 +8,167 @@ import ImageUpload from '../components/ImageUpload'
 
 const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true })
 
+// localStorage key — new post aur edit post ke liye alag key
+const getDraftKey = (id) => id ? `blog_draft_edit_${id}` : 'blog_draft_new'
+
+const DEFAULT_FORM = {
+  title: '', slug: '', content: '', excerpt: '', featuredImage: '', featuredImageAlt: '',
+  featuredImageTitle: '', featuredImageCaption: '', featuredImageDescription: '',
+  author: 'Admin', category: '', tags: [], published: true,
+  publishedAt: new Date().toISOString().slice(0, 16),
+  metaTitle: '', metaDescription: '', metaKeywords: '',
+  canonicalUrl: '', ogImage: '', ogImageAlt: '', ogTitle: '', ogDescription: '',
+  schemaMarkup: '', isIndexed: true, isFeatured: false,
+}
+
 const BlogPostForm = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const isEdit = !!id
 
-  const [form, setForm] = useState({
-    title: '', slug: '', content: '', excerpt: '', featuredImage: '', featuredImageAlt: '',
-    author: 'Admin', category: '', tags: [], published: true,
-    publishedAt: new Date().toISOString().slice(0, 16),
-    metaTitle: '', metaDescription: '', metaKeywords: '',
-    canonicalUrl: '', ogImage: '', ogTitle: '', ogDescription: '',
-    schemaMarkup: '', isIndexed: true, isFeatured: false,
-  })
+  const DRAFT_KEY = getDraftKey(id)
+
+  const [form, setForm] = useState(DEFAULT_FORM)
   const [tagInput, setTagInput] = useState('')
   const [saving, setSaving] = useState(false)
+  const [savingDraft, setSavingDraft] = useState(false)
   const [loading, setLoading] = useState(isEdit)
   const [showSeo, setShowSeo] = useState(false)
   const [charCount, setCharCount] = useState({ metaTitle: 0, metaDescription: 0 })
 
+  // Auto-draft states
+  const [hasDraft, setHasDraft] = useState(false)
+  const [showDraftBanner, setShowDraftBanner] = useState(false)
+  const [draftSavedAt, setDraftSavedAt] = useState(null)
+  const [autoSaveStatus, setAutoSaveStatus] = useState('') // 'saving' | 'saved' | ''
+  const autoSaveTimerRef = useRef(null)
+  const formRef = useRef(form)
+
+  // formRef ko hamesha latest form ke saath sync rakho
+  useEffect(() => {
+    formRef.current = form
+  }, [form])
+
+  // ─── Draft localStorage mein save karo ───
+  const saveDraftToLocal = useCallback((data) => {
+    try {
+      const draft = {
+        ...data,
+        _draftSavedAt: new Date().toISOString(),
+      }
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
+      setDraftSavedAt(new Date())
+      return true
+    } catch {
+      return false
+    }
+  }, [DRAFT_KEY])
+
+  // ─── Draft localStorage se load karo ───
+  const loadDraftFromLocal = useCallback(() => {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY)
+      if (!raw) return null
+      return JSON.parse(raw)
+    } catch {
+      return null
+    }
+  }, [DRAFT_KEY])
+
+  // ─── Draft clear karo ───
+  const clearDraft = useCallback(() => {
+    localStorage.removeItem(DRAFT_KEY)
+    setHasDraft(false)
+    setShowDraftBanner(false)
+    setDraftSavedAt(null)
+  }, [DRAFT_KEY])
+
+  // ─── Auto-save: form change hone ke 3 sec baad ───
+  useEffect(() => {
+    // Sirf tab auto-save karo jab title ya content kuch ho
+    if (!form.title && !form.content) return
+
+    setAutoSaveStatus('saving')
+
+    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current)
+
+    autoSaveTimerRef.current = setTimeout(() => {
+      saveDraftToLocal(form)
+      setAutoSaveStatus('saved')
+      setTimeout(() => setAutoSaveStatus(''), 2000)
+    }, 3000)
+
+    return () => {
+      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current)
+    }
+  }, [form, saveDraftToLocal])
+
+  // ─── Page close/refresh pe save karo (beforeunload) ───
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      const current = formRef.current
+      if (current.title || current.content) {
+        saveDraftToLocal(current)
+        e.preventDefault()
+        e.returnValue = ''
+      }
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [saveDraftToLocal])
+
+  // ─── Page load pe draft check karo ───
+  useEffect(() => {
+    if (isEdit) return // Edit mode mein draft restore nahi karenge
+    const draft = loadDraftFromLocal()
+    if (draft && draft.title) {
+      setHasDraft(true)
+      setShowDraftBanner(true)
+    }
+  }, [isEdit, loadDraftFromLocal])
+
+  // ─── Draft restore karo ───
+  const restoreDraft = () => {
+    const draft = loadDraftFromLocal()
+    if (!draft) return
+    const { _draftSavedAt, ...formData } = draft
+    setForm({ ...DEFAULT_FORM, ...formData })
+    setDraftSavedAt(new Date(_draftSavedAt))
+    setShowDraftBanner(false)
+    Toast.fire({ icon: 'info', title: 'Draft restored successfully!' })
+  }
+
+  // ─── Manual draft save (server pe — published: false) ───
+  const handleSaveDraft = async () => {
+    if (!form.title.trim()) {
+      Toast.fire({ icon: 'warning', title: 'Please add a title before saving draft' })
+      return
+    }
+    setSavingDraft(true)
+    try {
+      const payload = {
+        ...form,
+        published: false, // Draft = unpublished
+        publishedAt: null,
+      }
+      if (isEdit) {
+        await api.put(`/admin/blog/${id}`, payload)
+      } else {
+        await api.post('/admin/blog', payload)
+      }
+      clearDraft() // Server pe save ho gaya, local draft clear karo
+      Toast.fire({ icon: 'success', title: '✓ Draft saved to server!' })
+      if (!isEdit) navigate('/blog')
+    } catch (err) {
+      // Server fail ho to local mein save karo
+      saveDraftToLocal(form)
+      Toast.fire({ icon: 'warning', title: 'Server save failed — draft saved locally' })
+    } finally {
+      setSavingDraft(false)
+    }
+  }
+
+  // ─── charCount update ───
   useEffect(() => {
     setCharCount({
       metaTitle: form.metaTitle?.length || 0,
@@ -34,10 +176,11 @@ const BlogPostForm = () => {
     })
   }, [form.metaTitle, form.metaDescription])
 
+  // ─── Edit mode: existing post load karo ───
   useEffect(() => {
     if (isEdit) {
-      api.get(`/admin/blog?limit=50`).then(res => {
-        const found = res.data.data.find(p => p._id === id)
+      api.get(`/admin/blog/${id}`).then(res => {
+        const found = res.data.data
         if (found) {
           setForm({
             title: found.title || '',
@@ -46,6 +189,9 @@ const BlogPostForm = () => {
             excerpt: found.excerpt || '',
             featuredImage: found.featuredImage || '',
             featuredImageAlt: found.featuredImageAlt || '',
+            featuredImageTitle: found.featuredImageTitle || '',
+            featuredImageCaption: found.featuredImageCaption || '',
+            featuredImageDescription: found.featuredImageDescription || '',
             author: found.author || 'Admin',
             category: found.category || '',
             tags: found.tags || [],
@@ -56,6 +202,7 @@ const BlogPostForm = () => {
             metaKeywords: found.metaKeywords || '',
             canonicalUrl: found.canonicalUrl || '',
             ogImage: found.ogImage || '',
+            ogImageAlt: found.ogImageAlt || '',
             ogTitle: found.ogTitle || '',
             ogDescription: found.ogDescription || '',
             schemaMarkup: found.schemaMarkup || '',
@@ -97,6 +244,7 @@ const BlogPostForm = () => {
     setForm(prev => ({ ...prev, tags: prev.tags.filter(t => t !== tag) }))
   }
 
+  // ─── Publish / Update submit ───
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSaving(true)
@@ -105,12 +253,12 @@ const BlogPostForm = () => {
         ...form,
         publishedAt: form.published ? new Date(form.publishedAt).toISOString() : null,
       }
-
       if (isEdit) {
         await api.put(`/admin/blog/${id}`, payload)
       } else {
         await api.post('/admin/blog', payload)
       }
+      clearDraft() // Publish ho gaya — draft delete karo
       Toast.fire({ icon: 'success', title: isEdit ? 'Post updated!' : 'Post created!' })
       navigate('/blog')
     } catch (err) {
@@ -122,23 +270,98 @@ const BlogPostForm = () => {
 
   const seoScore = () => {
     let score = 0
-    if (form.metaTitle && form.metaTitle.length >= 30) score += 20
-    if (form.metaDescription && form.metaDescription.length >= 50) score += 20
+    if (form.metaTitle && form.metaTitle.length >= 30) score += 15
+    if (form.metaDescription && form.metaDescription.length >= 50) score += 15
     if (form.metaKeywords) score += 10
     if (form.ogImage) score += 10
-    if (form.ogTitle) score += 10
-    if (form.ogDescription) score += 10
+    if (form.ogTitle) score += 5
+    if (form.ogDescription) score += 5
     if (form.canonicalUrl) score += 10
     if (form.slug) score += 5
     if (form.excerpt) score += 5
-    return score
+    // Image SEO fields
+    if (form.featuredImageAlt) score += 10
+    if (form.featuredImageTitle) score += 5
+    if (form.featuredImageCaption) score += 5
+    if (form.ogImageAlt) score += 5
+    return Math.min(score, 100)
+  }
+
+  const formatDraftTime = (date) => {
+    if (!date) return ''
+    return date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
   }
 
   return (
     <div className="card">
       <div className="card-header">
-        <h3><FileText size={18} style={{ marginRight: 8, verticalAlign: 'middle' }} />{isEdit ? 'Edit Post' : 'New Blog Post'}</h3>
+        <h3>
+          <FileText size={18} style={{ marginRight: 8, verticalAlign: 'middle' }} />
+          {isEdit ? 'Edit Post' : 'New Blog Post'}
+        </h3>
+
+        {/* Auto-save status indicator */}
+        {autoSaveStatus && (
+          <span style={{
+            fontSize: 12, color: autoSaveStatus === 'saved' ? '#10b981' : '#6b7280',
+            display: 'flex', alignItems: 'center', gap: 4,
+          }}>
+            {autoSaveStatus === 'saving' ? (
+              <><Clock size={13} /> Auto-saving...</>
+            ) : (
+              <><Save size={13} /> Draft auto-saved locally</>
+            )}
+          </span>
+        )}
+
+        {/* Last saved time */}
+        {draftSavedAt && autoSaveStatus === '' && (
+          <span style={{ fontSize: 12, color: '#9ca3af', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Clock size={12} /> Last saved at {formatDraftTime(draftSavedAt)}
+          </span>
+        )}
       </div>
+
+      {/* ─── Draft Restore Banner ─── */}
+      {showDraftBanner && hasDraft && (
+        <div style={{
+          margin: '0 0 0 0',
+          padding: '12px 20px',
+          background: '#fffbeb',
+          borderBottom: '1px solid #fcd34d',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 12,
+          flexWrap: 'wrap',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Save size={16} color="#d97706" />
+            <span style={{ fontSize: 14, color: '#92400e', fontWeight: 500 }}>
+              You have an unsaved draft from your last session.
+            </span>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={restoreDraft}
+              style={{ fontSize: 13 }}
+            >
+              Restore Draft
+            </button>
+            <button
+              type="button"
+              className="btn btn-outline btn-sm"
+              onClick={() => { clearDraft(); setShowDraftBanner(false) }}
+              style={{ fontSize: 13 }}
+            >
+              Discard
+            </button>
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <div style={{ padding: 32 }}>
           <div className="skeleton-form">
@@ -183,9 +406,16 @@ const BlogPostForm = () => {
           <ImageUpload
             value={form.featuredImage}
             altValue={form.featuredImageAlt}
+            titleValue={form.featuredImageTitle}
+            captionValue={form.featuredImageCaption}
+            descriptionValue={form.featuredImageDescription}
             onChange={(url, alt) => setForm(prev => ({ ...prev, featuredImage: url, featuredImageAlt: alt || prev.featuredImageAlt }))}
             onAltChange={(alt) => setForm(prev => ({ ...prev, featuredImageAlt: alt }))}
+            onTitleChange={(title) => setForm(prev => ({ ...prev, featuredImageTitle: title }))}
+            onCaptionChange={(caption) => setForm(prev => ({ ...prev, featuredImageCaption: caption }))}
+            onDescriptionChange={(desc) => setForm(prev => ({ ...prev, featuredImageDescription: desc }))}
             label="Featured Image"
+            showExtendedMeta={true}
           />
         </div>
         <div className="form-group">
@@ -291,6 +521,7 @@ const BlogPostForm = () => {
                     onChange={(url, alt) => setForm(prev => ({ ...prev, ogImage: url, ogImageAlt: alt || prev.ogImageAlt }))}
                     onAltChange={(alt) => setForm(prev => ({ ...prev, ogImageAlt: alt }))}
                     label="OG Image"
+                    showExtendedMeta={false}
                   />
                 </div>
               </div>
@@ -313,7 +544,15 @@ const BlogPostForm = () => {
               <div className="seo-preview">
                 <h4 style={{ fontSize: 13, color: '#6b7280', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>Google Search Preview</h4>
                 <div className="google-preview">
-                  <div className="gp-url">{form.canonicalUrl ? new URL(form.canonicalUrl).hostname + new URL(form.canonicalUrl).pathname : 'yourdomain.com'}/{form.slug || 'post-slug'}</div>
+                  <div className="gp-url">{(() => {
+                    try {
+                      if (form.canonicalUrl) {
+                        const u = new URL(form.canonicalUrl)
+                        return u.hostname + u.pathname
+                      }
+                    } catch {}
+                    return 'yourdomain.com'
+                  })()}/{form.slug || 'post-slug'}</div>
                   <div className="gp-title">{(form.metaTitle || form.title || 'Post Title').slice(0, 60)}</div>
                   <div className="gp-desc">{(form.metaDescription || form.excerpt || 'No description provided').slice(0, 160)}</div>
                 </div>
@@ -322,11 +561,44 @@ const BlogPostForm = () => {
           )}
         </div>
 
-        <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
-          <button type="submit" className="btn btn-primary" disabled={saving}>
-            {saving ? 'Saving...' : (isEdit ? 'Update Post' : 'Create Post')}
+        {/* ─── Action Buttons ─── */}
+        <div style={{ display: 'flex', gap: 12, marginTop: 20, flexWrap: 'wrap', alignItems: 'center' }}>
+          {/* Publish / Update */}
+          <button type="submit" className="btn btn-primary" disabled={saving || savingDraft}>
+            {saving ? 'Saving...' : (isEdit ? 'Update Post' : 'Publish Post')}
           </button>
-          <button type="button" className="btn btn-outline" onClick={() => navigate('/blog')}>Cancel</button>
+
+          {/* Save as Draft */}
+          <button
+            type="button"
+            className="btn btn-outline"
+            onClick={handleSaveDraft}
+            disabled={saving || savingDraft}
+            style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+          >
+            <Save size={15} />
+            {savingDraft ? 'Saving Draft...' : 'Save as Draft'}
+          </button>
+
+          <button type="button" className="btn btn-outline" onClick={() => navigate('/blog')} disabled={saving || savingDraft}>
+            Cancel
+          </button>
+
+          {/* Local draft indicator */}
+          {draftSavedAt && (
+            <span style={{ fontSize: 12, color: '#9ca3af', marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4 }}>
+              <Clock size={12} />
+              Auto-saved locally at {formatDraftTime(draftSavedAt)}
+              <button
+                type="button"
+                onClick={clearDraft}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', fontSize: 11, marginLeft: 4, padding: '0 2px' }}
+                title="Clear local draft"
+              >
+                ✕ clear
+              </button>
+            </span>
+          )}
         </div>
       </form>
       )}
