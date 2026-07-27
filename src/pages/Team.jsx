@@ -14,7 +14,8 @@ const TeamPage = () => {
   const [modal, setModal] = useState(null)
   const [form, setForm] = useState({ name: '', title: '', image: '', imageAlt: '', socialLinks: { facebook: '', twitter: '', skype: '', youtube: '' }, isActive: true, order: 0 })
 
-  const fetchData = async () => {
+  const fetchData = async (showLoading = true) => {
+    if (showLoading) setLoading(true)
     try {
       const { data } = await api.get('/admin/team')
       setItems(data.data || [])

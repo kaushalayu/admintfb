@@ -16,7 +16,8 @@ const Products = () => {
   const [pagination, setPagination] = useState(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (showLoading = true) => {
+    if (showLoading) setLoading(true)
     try {
       const { data } = await api.get(`/admin/products?page=${page}&limit=10&search=${search}`)
       setProducts(data.data)
@@ -84,7 +85,7 @@ const Products = () => {
               onChange={e => { setSearch(e.target.value); setPage(1) }} style={{ paddingLeft: 36 }} />
           </div>
         </div>
-        <DataTable columns={columns} data={products} />
+        <DataTable columns={columns} data={products} loading={loading} />
         {pagination && pagination.pages > 1 && (
           <div className="pagination">
             <button disabled={page <= 1} onClick={() => setPage(p => p - 1)}>Previous</button>

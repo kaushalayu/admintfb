@@ -14,7 +14,8 @@ const Banners = () => {
   const [modal, setModal] = useState(null)
   const [form, setForm] = useState({ title: '', subtitle: '', description: '', image: '', imageAlt: '', link: '', btnText: 'Shop Now', type: 'hero', order: 0, isActive: true })
 
-  const fetchData = async () => {
+  const fetchData = async (showLoading = true) => {
+    if (showLoading) setLoading(true)
     try {
       const { data } = await api.get('/admin/banners')
       setItems(data.data || [])

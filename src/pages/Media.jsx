@@ -70,7 +70,19 @@ const Media = () => {
         </div>
       </div>
 
-      {loading ? <div className="empty-state"><h3>Loading...</h3></div> : media.length === 0 ? (
+      {loading ? (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 16, padding: 16 }}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} style={{ borderRadius: 'var(--radius)', overflow: 'hidden', border: '1px solid var(--border)' }}>
+              <div className="skeleton" style={{ height: 150 }} />
+              <div style={{ padding: 10 }}>
+                <div className="skeleton skeleton-cell skeleton-cell--md" style={{ marginBottom: 8 }} />
+                <div className="skeleton skeleton-cell skeleton-cell--sm" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : media.length === 0 ? (
         <div className="empty-state">
           <div className="empty-icon">🖼️</div>
           <h3>No media uploaded yet</h3>

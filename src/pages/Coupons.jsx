@@ -13,7 +13,8 @@ const Coupons = () => {
     code: '', type: 'percentage', value: '', minAmount: 0, usageLimit: 0, expiresAt: '', isActive: true,
   })
 
-  const fetchData = async () => {
+  const fetchData = async (showLoading = true) => {
+    if (showLoading) setLoading(true)
     try {
       const { data } = await api.get('/admin/coupons')
       setCoupons(data.data || [])

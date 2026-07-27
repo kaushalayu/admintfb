@@ -13,7 +13,8 @@ const Categories = () => {
   const [modal, setModal] = useState(null)
   const [form, setForm] = useState({ name: '', slug: '', description: '', image: '', imageAlt: '', order: 0 })
 
-  const fetchData = async () => {
+  const fetchData = async (showLoading = true) => {
+    if (showLoading) setLoading(true)
     try {       const { data } = await api.get('/admin/categories'); setCategories(data.data || []) }
     catch (err) { console.error(err) }
     finally { setLoading(false) }

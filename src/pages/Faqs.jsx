@@ -11,7 +11,8 @@ const Faqs = () => {
   const [modal, setModal] = useState(null)
   const [form, setForm] = useState({ question: '', answer: '', category: 'general', order: 0 })
 
-  const fetchData = async () => {
+  const fetchData = async (showLoading = true) => {
+    if (showLoading) setLoading(true)
     try {
       const { data } = await api.get('/admin/faq')
       setFaqs(data.data || [])

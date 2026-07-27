@@ -15,7 +15,8 @@ const BlogPosts = () => {
   const [pagination, setPagination] = useState(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
 
-  const fetchPosts = async () => {
+  const fetchPosts = async (showLoading = true) => {
+    if (showLoading) setLoading(true)
     try {
       const { data } = await api.get(`/admin/blog?page=${page}&limit=10`)
       setPosts(data.data)

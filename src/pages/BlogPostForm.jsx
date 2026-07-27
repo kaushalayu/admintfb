@@ -23,6 +23,7 @@ const BlogPostForm = () => {
   })
   const [tagInput, setTagInput] = useState('')
   const [saving, setSaving] = useState(false)
+  const [loading, setLoading] = useState(isEdit)
   const [showSeo, setShowSeo] = useState(false)
   const [charCount, setCharCount] = useState({ metaTitle: 0, metaDescription: 0 })
 
@@ -62,7 +63,7 @@ const BlogPostForm = () => {
             isFeatured: found.isFeatured ?? false,
           })
         }
-      }).catch(() => {})
+      }).catch(() => {}).finally(() => setLoading(false))
     }
   }, [id])
 
@@ -138,6 +139,18 @@ const BlogPostForm = () => {
       <div className="card-header">
         <h3><FileText size={18} style={{ marginRight: 8, verticalAlign: 'middle' }} />{isEdit ? 'Edit Post' : 'New Blog Post'}</h3>
       </div>
+      {loading ? (
+        <div style={{ padding: 32 }}>
+          <div className="skeleton-form">
+            {[1,2,3,4,5,6].map(i => (
+              <div className="skeleton-field" key={i} style={{ marginBottom: 20 }}>
+                <div className="skeleton skeleton-field--label" />
+                <div className="skeleton skeleton-field--input" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
       <form onSubmit={handleSubmit}>
         <div className="form-row">
           <div className="form-group" style={{ flex: 2 }}>
@@ -316,6 +329,7 @@ const BlogPostForm = () => {
           <button type="button" className="btn btn-outline" onClick={() => navigate('/blog')}>Cancel</button>
         </div>
       </form>
+      )}
     </div>
   )
 }

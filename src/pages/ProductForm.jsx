@@ -24,12 +24,12 @@ const ProductForm = () => {
   const [specKey, setSpecKey] = useState('')
   const [specValue, setSpecValue] = useState('')
   const [saving, setSaving] = useState(false)
+  const [loading, setLoading] = useState(isEdit)
 
   useEffect(() => {
-    api.get('/admin/categories').then(res => setCategories(res.data.data || [])).catch(() => {})
-    if (isEdit) {
-      // We need to fetch by ID using a different approach since API uses slug
-      api.get('/admin/products?limit=50').then(res => {
+    Promise.all([
+      api.get('/admin/categories').then(res => setCategories(res.data.data || [])),
+      isEdit ? api.get('/admin/products?limit=50').then(res => {
         const found = res.data.data.find(p => p._id === id)
         if (found) setForm({
           title: found.title || '',
@@ -51,14 +51,13 @@ const ProductForm = () => {
           additionalInfo: found.additionalInfo || '',
           customContent: found.customContent || '',
           images: found.images?.length > 0 ? found.images : [{ url: '', alt: '', isPrimary: true }],
-          // SEO fields
           metaTitle: found.metaTitle || '',
           metaDescription: found.metaDescription || '',
           metaKeywords: found.metaKeywords || '',
           canonicalUrl: found.canonicalUrl || '',
         })
-      }).catch(() => {})
-    }
+      }).catch(() => {}) : Promise.resolve(),
+    ]).finally(() => setLoading(false))
   }, [id])
 
   const handleChange = (e) => {
@@ -185,6 +184,18 @@ const ProductForm = () => {
       <div className="card-header">
         <h3>{isEdit ? 'Edit Product' : 'Add New Product'}</h3>
       </div>
+      {loading ? (
+        <div style={{ padding: 32 }}>
+          <div className="skeleton-form">
+            {[1,2,3,4,5,6,7,8].map(i => (
+              <div className="skeleton-field" key={i} style={{ marginBottom: 20 }}>
+                <div className="skeleton skeleton-field--label" />
+                <div className="skeleton skeleton-field--input" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
       <form onSubmit={handleSubmit}>
         <div className="form-row">
           <div className="form-group">
@@ -403,6 +414,7 @@ const ProductForm = () => {
           <button type="button" className="btn btn-outline" onClick={() => navigate('/products')}>Cancel</button>
         </div>
       </form>
+      )}
     </div>
   )
 }

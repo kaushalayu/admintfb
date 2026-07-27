@@ -14,7 +14,8 @@ const Testimonials = () => {
   const [modal, setModal] = useState(null)
   const [form, setForm] = useState({ name: '', title: '', content: '', rating: 5, image: '', imageAlt: '', isActive: true, order: 0 })
 
-  const fetchData = async () => {
+  const fetchData = async (showLoading = true) => {
+    if (showLoading) setLoading(true)
     try {
       const { data } = await api.get('/admin/testimonials')
       setItems(data.data || [])

@@ -10,7 +10,8 @@ const BlogComments = () => {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
 
-  const fetchData = async () => {
+  const fetchData = async (showLoading = true) => {
+    if (showLoading) setLoading(true)
     try {
       const params = {}
       if (filter === 'pending') params.approved = 'false'

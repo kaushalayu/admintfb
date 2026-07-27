@@ -69,6 +69,94 @@ body {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* SKELETON LOADING */
+@keyframes skeletonShimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--border-light) 25%, #e8eaed 37%, var(--border-light) 63%);
+  background-size: 200px 100%;
+  animation: skeletonShimmer 1.4s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+
+.skeleton-table { width: 100%; }
+
+.skeleton-table thead th {
+  height: 16px;
+  width: 100%;
+}
+
+.skeleton-table tbody tr {
+  border-bottom: 1px solid var(--border-light);
+}
+
+.skeleton-table tbody td {
+  padding: 14px 12px;
+}
+
+.skeleton-cell {
+  height: 16px;
+  border-radius: 4px;
+}
+
+.skeleton-cell--sm { width: 60%; }
+.skeleton-cell--md { width: 80%; }
+.skeleton-cell--lg { width: 100%; }
+
+.skeleton-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+}
+
+.skeleton-badge {
+  width: 70px;
+  height: 24px;
+  border-radius: 12px;
+}
+
+.skeleton-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+}
+
+/* Form skeleton */
+.skeleton-form .skeleton-field { margin-bottom: 16px; }
+
+.skeleton-field { width: 100%; }
+.skeleton-field--label { height: 14px; width: 100px; margin-bottom: 8px; }
+.skeleton-field--input { height: 40px; width: 100%; border-radius: var(--radius-sm); }
+
+/* Stats skeleton */
+.skeleton-stat {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+
+.skeleton-stat__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+}
+
+.skeleton-stat__value {
+  height: 28px;
+  width: 80px;
+  margin-top: 12px;
+}
+
+.skeleton-stat__label {
+  height: 14px;
+  width: 100px;
+  margin-top: 8px;
+}
+
 /* LAYOUT */
 .admin-layout {
   display: flex;

@@ -13,7 +13,8 @@ const Brands = () => {
   const [modal, setModal] = useState(null)
   const [form, setForm] = useState({ name: '', slug: '', logo: '', logoAlt: '' })
 
-  const fetchData = async () => {
+  const fetchData = async (showLoading = true) => {
+    if (showLoading) setLoading(true)
     try {       const { data } = await api.get('/admin/brands'); setBrands(data.data || []) }
     catch (err) { console.error(err) }
     finally { setLoading(false) }

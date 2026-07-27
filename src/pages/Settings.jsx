@@ -18,20 +18,18 @@ const Settings = () => {
     whatsappProvider: 'meta', metaPhoneId: '', metaToken: '', twilioSid: '', twilioToken: '', twilioFrom: 'whatsapp:+14155238886',
   })
   const [saving, setSaving] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [wpConfigStatus, setWpConfigStatus] = useState(null)
 
   useEffect(() => {
-    api.get('/admin/settings')
-      .then(res => {
-        if (res.data.data) setForm(prev => ({ ...prev, ...res.data.data }))
-      })
-      .catch(err => console.error(err))
-    api.get('/admin/whatsapp/config')
-      .then(res => { if (res.data.data) setForm(prev => ({ ...prev, ...res.data.data })) })
-      .catch(() => {})
-    api.get('/admin/whatsapp/config-status')
-      .then(res => setWpConfigStatus(res.data))
-      .catch(() => {})
+    Promise.all([
+      api.get('/admin/settings')
+        .then(res => { if (res.data.data) setForm(prev => ({ ...prev, ...res.data.data })) }),
+      api.get('/admin/whatsapp/config')
+        .then(res => { if (res.data.data) setForm(prev => ({ ...prev, ...res.data.data })) }),
+      api.get('/admin/whatsapp/config-status')
+        .then(res => setWpConfigStatus(res.data)),
+    ]).catch(() => {}).finally(() => setLoading(false))
   }, [])
 
   const handleChange = (e) => {
@@ -62,6 +60,18 @@ const Settings = () => {
   return (
     <div className="card">
       <div className="card-header"><h3>Site Settings</h3></div>
+      {loading ? (
+        <div style={{ padding: 32 }}>
+          <div className="skeleton-form">
+            {[1,2,3,4,5,6].map(i => (
+              <div className="skeleton-field" key={i} style={{ marginBottom: 20 }}>
+                <div className="skeleton skeleton-field--label" />
+                <div className="skeleton skeleton-field--input" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
       <form onSubmit={handleSubmit}>
         <h4 style={{ margin: '16px 0 8px', color: 'var(--primary)' }}>General</h4>
         <div className="form-row">
@@ -298,6 +308,7 @@ const Settings = () => {
           {saving ? 'Saving...' : 'Save Settings'}
         </button>
       </form>
+      )}
     </div>
   )
 }

@@ -14,7 +14,8 @@ const Portfolio = () => {
   const [modal, setModal] = useState(null)
   const [form, setForm] = useState({ title: '', description: '', image: '', imageAlt: '', category: 'general', link: '', order: 0, isActive: true })
 
-  const fetchData = async () => {
+  const fetchData = async (showLoading = true) => {
+    if (showLoading) setLoading(true)
     try {
       const { data } = await api.get('/admin/portfolio')
       setItems(data.data || [])

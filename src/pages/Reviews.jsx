@@ -12,7 +12,8 @@ const Reviews = () => {
   const [page, setPage] = useState(1)
   const [pagination, setPagination] = useState(null)
 
-  const fetchReviews = async () => {
+  const fetchReviews = async (showLoading = true) => {
+    if (showLoading) setLoading(true)
     try {
       const { data } = await api.get(`/admin/reviews?page=${page}&limit=15`)
       setReviews(data.data)
