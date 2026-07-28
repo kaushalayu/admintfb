@@ -363,16 +363,7 @@ const BlogPostForm = () => {
       )}
 
       {loading ? (
-        <div style={{ padding: 32 }}>
-          <div className="skeleton-form">
-            {[1,2,3,4,5,6].map(i => (
-              <div className="skeleton-field" key={i} style={{ marginBottom: 20 }}>
-                <div className="skeleton skeleton-field--label" />
-                <div className="skeleton skeleton-field--input" />
-              </div>
-            ))}
-          </div>
-        </div>
+        <div style={{ padding: 32 }}><h3>Loading...</h3></div>
       ) : (
       <form onSubmit={handleSubmit}>
         <div className="form-row">
