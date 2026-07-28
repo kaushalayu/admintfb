@@ -140,10 +140,10 @@ const Users = () => {
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           <button className="btn btn-outline btn-sm" onClick={() => Swal.fire({ title: 'User Details', html: `
             <div style="text-align:left">
-              <p><strong>Name:</strong> ${row.name}</p>
-              <p><strong>Email:</strong> ${row.email}</p>
-              <p><strong>Phone:</strong> ${row.phone || '—'}</p>
-              <p><strong>Role:</strong> ${row.role}</p>
+              <p><strong>Name:</strong> ${row.name?.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+              <p><strong>Email:</strong> ${row.email?.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+              <p><strong>Phone:</strong> ${(row.phone || '—').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+              <p><strong>Role:</strong> ${row.role?.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
               <p><strong>Joined:</strong> ${new Date(row.createdAt).toLocaleDateString()}</p>
               <p><strong>Addresses:</strong> ${(row.addresses || []).length}</p>
             </div>`, icon: 'info' })}>View</button>

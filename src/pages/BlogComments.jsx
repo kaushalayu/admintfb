@@ -48,9 +48,13 @@ const BlogComments = () => {
             <Mail size={10} />{row.email}
           </a>
           {row.website && (
-            <a href={row.website} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#6366f1', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
-              <Globe size={10} />Website
-            </a>
+            row.website.startsWith('http://') || row.website.startsWith('https://')
+              ? <a href={row.website} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#6366f1', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
+                  <Globe size={10} />Website
+                </a>
+              : <span style={{ fontSize: 11, color: '#9ca3af', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
+                  <Globe size={10} />{row.website}
+                </span>
           )}
         </div>
       </div>
@@ -80,7 +84,7 @@ const BlogComments = () => {
             </button>
           )}
           {row.post?.slug && (
-            <a href={`/blog/${row.post.slug}`} target="_blank" rel="noopener noreferrer" className="btn btn-outline btn-sm" title="View post">
+            <a href={`https://thefurnitureboutique.in/blog/${row.post.slug}`} target="_blank" rel="noopener noreferrer" className="btn btn-outline btn-sm" title="View post">
               <ExternalLink size={14} />
             </a>
           )}
