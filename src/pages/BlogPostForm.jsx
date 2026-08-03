@@ -34,7 +34,6 @@ const BlogPostForm = () => {
   const [savingDraft, setSavingDraft] = useState(false)
   const [loading, setLoading] = useState(isEdit)
   const [showSeo, setShowSeo] = useState(false)
-  const [charCount, setCharCount] = useState({ metaTitle: 0, metaDescription: 0 })
 
   // Auto-draft states
   const [hasDraft, setHasDraft] = useState(false)
@@ -167,14 +166,6 @@ const BlogPostForm = () => {
       setSavingDraft(false)
     }
   }
-
-  // ─── charCount update ───
-  useEffect(() => {
-    setCharCount({
-      metaTitle: form.metaTitle?.length || 0,
-      metaDescription: form.metaDescription?.length || 0,
-    })
-  }, [form.metaTitle, form.metaDescription])
 
   // ─── Edit mode: existing post load karo ───
   useEffect(() => {
@@ -459,12 +450,9 @@ const BlogPostForm = () => {
               <div className="form-row">
                 <div className="form-group">
                   <label>Meta Title</label>
-                  <input className={`form-control ${charCount.metaTitle > 70 ? 'is-invalid' : ''}`}
+                  <input className="form-control"
                     name="metaTitle" value={form.metaTitle} onChange={handleChange}
-                    placeholder="SEO title (recommended: 50-60 chars)" maxLength={70} />
-                  <div className={`seo-counter ${charCount.metaTitle > 60 ? 'warn' : ''} ${charCount.metaTitle > 70 ? 'over' : ''}`}>
-                    {charCount.metaTitle}/70 · {charCount.metaTitle > 70 ? 'Too long!' : charCount.metaTitle >= 50 ? 'Good' : 'Too short'}
-                  </div>
+                    placeholder="SEO title (recommended: 50-60 chars)" />
                 </div>
                 <div className="form-group">
                   <label>Indexing</label>
@@ -477,12 +465,9 @@ const BlogPostForm = () => {
 
               <div className="form-group">
                 <label>Meta Description</label>
-                <textarea className={`form-control ${charCount.metaDescription > 160 ? 'is-invalid' : ''}`}
+                <textarea className="form-control"
                   name="metaDescription" value={form.metaDescription} onChange={handleChange} rows={2}
-                  placeholder="Brief description for search results (recommended: 120-160 chars)" maxLength={160} />
-                <div className={`seo-counter ${charCount.metaDescription > 160 ? 'over' : charCount.metaDescription >= 120 ? 'warn' : ''}`}>
-                  {charCount.metaDescription}/160 · {charCount.metaDescription > 160 ? 'Too long!' : charCount.metaDescription >= 120 ? 'Good length' : 'Consider adding more'}
-                </div>
+                  placeholder="Brief description for search results (recommended: 120-160 chars)" />
               </div>
 
               <div className="form-group">
@@ -503,7 +488,7 @@ const BlogPostForm = () => {
               <div className="form-row">
                 <div className="form-group">
                   <label>OG Title</label>
-                  <input className="form-control" name="ogTitle" value={form.ogTitle} onChange={handleChange} placeholder="Title for social share" maxLength={70} />
+                  <input className="form-control" name="ogTitle" value={form.ogTitle} onChange={handleChange} placeholder="Title for social share" />
                 </div>
                 <div className="form-group">
                   <ImageUpload
@@ -519,7 +504,7 @@ const BlogPostForm = () => {
 
               <div className="form-group">
                 <label>OG Description</label>
-                <textarea className="form-control" name="ogDescription" value={form.ogDescription} onChange={handleChange} rows={2} placeholder="Description for social sharing" maxLength={200} />
+                <textarea className="form-control" name="ogDescription" value={form.ogDescription} onChange={handleChange} rows={2} placeholder="Description for social sharing" />
               </div>
 
               <h4 style={{ margin: '16px 0 8px', fontSize: 14, color: '#6366f1', display: 'flex', alignItems: 'center', gap: 6 }}>
